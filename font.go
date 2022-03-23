@@ -17,16 +17,6 @@ const (
 	TopToBottom                  // E.g.: Chinese
 )
 
-// A Font allows rendering of text to an OpenGL context.
-type Font struct {
-	fontChar []*character
-	vao      uint32
-	vbo      uint32
-	program  uint32
-	texture  uint32 // Holds the glyph texture id.
-	color    color
-}
-
 type color struct {
 	r float32
 	g float32
@@ -82,8 +72,6 @@ func (f *Font) Printf(x, y float32, scale float32, align int32, blend bool, wind
 		return nil
 	}
 
-	lowChar := rune(32)
-
 	//setup blending mode
 	gl.Enable(gl.BLEND)
 	if blend {
@@ -118,14 +106,21 @@ func (f *Font) Printf(x, y float32, scale float32, align int32, blend bool, wind
 		//get rune
 		runeIndex := indices[i]
 
-		//skip runes that are not in font character range
-		if int(runeIndex)-int(lowChar) > len(f.fontChar) || runeIndex < lowChar {
+		//find rune in fontChar list
+		ch, ok := f.fontChar[runeIndex]
+
+		//load missing runes in batches of 32
+		if !ok {
+			low := runeIndex - (runeIndex % 32)
+			f.GenerateGlyphs(low, low + 31)
+			ch, ok = f.fontChar[runeIndex]
+		}
+
+		//skip runes that are not in font chacter range
+		if !ok {
 			//fmt.Printf("%c %d\n", runeIndex, runeIndex)
 			continue
 		}
-
-		//find rune in fontChar list
-		ch := f.fontChar[runeIndex-lowChar]
 
 		//calculate position and size for current rune
 		xpos := x + float32(ch.bearingH)*scale
@@ -179,22 +174,27 @@ func (f *Font) Width(scale float32, fs string, argv ...interface{}) float32 {
 		return 0
 	}
 
-	lowChar := rune(32)
-
 	// Iterate through all characters in string
 	for i := range indices {
 
 		//get rune
 		runeIndex := indices[i]
 
-		//skip runes that are not in font character range
-		if int(runeIndex)-int(lowChar) > len(f.fontChar) || runeIndex < lowChar {
+		//find rune in fontChar list
+		ch, ok := f.fontChar[runeIndex]
+
+		//load missing runes in batches of 32
+		if !ok {
+			low := runeIndex & rune(32 - 1)
+			f.GenerateGlyphs(low, low + 31)
+			ch, ok = f.fontChar[runeIndex]
+		}
+
+		//skip runes that are not in font chacter range
+		if !ok {
 			//fmt.Printf("%c %d\n", runeIndex, runeIndex)
 			continue
 		}
-
-		//find rune in fontChar list
-		ch := f.fontChar[runeIndex-lowChar]
 
 		// Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
 		width += float32((ch.advance >> 6)) * scale // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))

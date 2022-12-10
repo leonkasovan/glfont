@@ -1,7 +1,7 @@
 package glfont
 
 import (
-	"github.com/leonkasovan/gl/v3.1/gles2"
+	gl "github.com/leonkasovan/gl/v3.1/gles2"
 
 	"fmt"
 	"strings"

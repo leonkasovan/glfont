@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/leonkasovan/gl/v3.1/gles2"
+	gl "github.com/leonkasovan/gl/v3.1/gles2"
 )
 
 // Direction represents the direction in which strings should be rendered.

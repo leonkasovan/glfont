@@ -1,8 +1,9 @@
+//go:build !gles2
 package glfont
 
 import (
 	"fmt"
-	gl "github.com/leonkasovan/gl/v3.1/gles2"
+	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"

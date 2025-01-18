@@ -18,7 +18,7 @@ func (r *FontRenderer_GLES) LoadFont(file string, scale int32, windowWidth int, 
 	defer fd.Close()
 
 	// Configure the default font vertex and fragment shaders
-	program, err := r.newProgram(320, vertexFontShader, fragmentFontShader)
+	program, err := r.newProgram(300, vertexFontShader, fragmentFontShader)
 	if err != nil {
 		panic(err)
 	}

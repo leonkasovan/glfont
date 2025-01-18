@@ -1,16 +1,15 @@
-//go:build gles2
-
+//go:build !gles2
 package glfont
 
 import (
 	"fmt"
 	"os"
 
-	gl "github.com/leonkasovan/gl/v3.1/gles2"
+	gl "github.com/go-gl/gl/v3.2-core/gl"
 )
 
 // LoadFont loads the specified font at the given scale.
-func (r *FontRenderer_GLES) LoadFont(file string, scale int32, windowWidth int, windowHeight int) (Font, error) {
+func (r *FontRenderer_GL32) LoadFont(file string, scale int32, windowWidth int, windowHeight int) (Font, error) {
 	fd, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -18,7 +17,7 @@ func (r *FontRenderer_GLES) LoadFont(file string, scale int32, windowWidth int, 
 	defer fd.Close()
 
 	// Configure the default font vertex and fragment shaders
-	program, err := r.newProgram(320, vertexFontShader, fragmentFontShader)
+	program, err := r.newProgram(150, vertexFontShader, fragmentFontShader)
 	if err != nil {
 		panic(err)
 	}
@@ -34,14 +33,14 @@ func (r *FontRenderer_GLES) LoadFont(file string, scale int32, windowWidth int, 
 }
 
 // SetColor allows you to set the text color to be used when you draw the text
-func (f *Font_GLES) SetColor(red float32, green float32, blue float32, alpha float32) {
+func (f *Font_GL32) SetColor(red float32, green float32, blue float32, alpha float32) {
 	f.color.r = red
 	f.color.g = green
 	f.color.b = blue
 	f.color.a = alpha
 }
 
-func (f *Font_GLES) UpdateResolution(windowWidth int, windowHeight int) {
+func (f *Font_GL32) UpdateResolution(windowWidth int, windowHeight int) {
 	gl.UseProgram(f.program)
 	resUniform := gl.GetUniformLocation(f.program, gl.Str("resolution\x00"))
 	gl.Uniform2f(resUniform, float32(windowWidth), float32(windowHeight))
@@ -49,7 +48,7 @@ func (f *Font_GLES) UpdateResolution(windowWidth int, windowHeight int) {
 }
 
 // Printf draws a string to the screen, takes a list of arguments like printf
-func (f *Font_GLES) Printf(x, y float32, scale float32, align int32, blend bool, window [4]int32, fs string, argv ...interface{}) error {
+func (f *Font_GL32) Printf(x, y float32, scale float32, align int32, blend bool, window [4]int32, fs string, argv ...interface{}) error {
 
 	indices := []rune(fmt.Sprintf(fs, argv...))
 
@@ -148,7 +147,7 @@ func (f *Font_GLES) Printf(x, y float32, scale float32, align int32, blend bool,
 }
 
 // Helper function to render a batch of glyphs
-func (f *Font_GLES) renderGlyphBatch(batchChars []*character, indices []rune, vertices []float32) {
+func (f *Font_GL32) renderGlyphBatch(batchChars []*character, indices []rune, vertices []float32) {
 	// Bind the buffer and update its data
 	gl.BindBuffer(gl.ARRAY_BUFFER, f.vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(vertices)*4, gl.Ptr(vertices), gl.DYNAMIC_DRAW)
@@ -171,7 +170,7 @@ func (f *Font_GLES) renderGlyphBatch(batchChars []*character, indices []rune, ve
 }
 
 // Width returns the width of a piece of text in pixels
-func (f *Font_GLES) Width(scale float32, fs string, argv ...interface{}) float32 {
+func (f *Font_GL32) Width(scale float32, fs string, argv ...interface{}) float32 {
 
 	var width float32
 

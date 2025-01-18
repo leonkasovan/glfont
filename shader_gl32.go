@@ -1,17 +1,17 @@
-//go:build gles2
+//go:build !gles2
 package glfont
 
 import (
 	"fmt"
 	"strings"
 
-	gl "github.com/leonkasovan/gl/v3.1/gles2"
+	gl "github.com/go-gl/gl/v3.2-core/gl"
 )
 
 // newProgram links the frag and vertex shader programs
-func (r *FontRenderer_GLES) newProgram(GLSLVersion uint, vertexShaderSource, fragmentShaderSource string) (uint32, error) {
-	vertexShaderSource = fmt.Sprintf("#version %d es\nprecision mediump float;\n", GLSLVersion) + vertexShaderSource
-	fragmentShaderSource = fmt.Sprintf("#version %d es\nprecision mediump float;\n", GLSLVersion) + fragmentShaderSource
+func (r *FontRenderer_GL32) newProgram(GLSLVersion uint, vertexShaderSource, fragmentShaderSource string) (uint32, error) {
+	vertexShaderSource = fmt.Sprintf("#version %d\n", GLSLVersion) + vertexShaderSource
+	fragmentShaderSource = fmt.Sprintf("#version %d\n", GLSLVersion) + fragmentShaderSource
 	compileShader := func(source string, shaderType uint32) (uint32, error) {
 		shader := gl.CreateShader(shaderType)
 

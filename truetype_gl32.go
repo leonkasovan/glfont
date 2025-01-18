@@ -1,4 +1,4 @@
-//go:build gles2
+//go:build !gles2
 package glfont
 
 import (
@@ -8,15 +8,14 @@ import (
 	"io"
 	"io/ioutil"
 
+	gl "github.com/go-gl/gl/v3.2-core/gl"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
-	gl "github.com/leonkasovan/gl/v3.1/gles2"
 	"golang.org/x/image/font"
 	"golang.org/x/image/math/fixed"
 )
 
-// A Font allows rendering of text to an OpenGL context.
-type Font_GLES struct {
+type Font_GL32 struct {
 	fontChar map[rune]*character
 	ttf      *truetype.Font
 	scale    int32
@@ -28,7 +27,7 @@ type Font_GLES struct {
 }
 
 // GenerateGlyphs builds a set of textures based on a ttf files gylphs
-func (f *Font_GLES) GenerateGlyphs(low, high rune) error {
+func (f *Font_GL32) GenerateGlyphs(low, high rune) error {
 	//create a freetype context for drawing
 	c := freetype.NewContext()
 	c.SetDPI(72)
@@ -121,7 +120,7 @@ func (f *Font_GLES) GenerateGlyphs(low, high rune) error {
 }
 
 // LoadTrueTypeFont builds OpenGL buffers and glyph textures based on a ttf file
-func (r *FontRenderer_GLES) LoadTrueTypeFont(program uint32, reader io.Reader, scale int32, low, high rune, dir Direction) (Font, error) {
+func (r *FontRenderer_GL32) LoadTrueTypeFont(program uint32, reader io.Reader, scale int32, low, high rune, dir Direction) (Font, error) {
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
@@ -134,7 +133,7 @@ func (r *FontRenderer_GLES) LoadTrueTypeFont(program uint32, reader io.Reader, s
 	}
 
 	//make Font stuct type
-	f := new(Font_GLES)
+	f := new(Font_GL32)
 	f.fontChar = make(map[rune]*character)
 	f.ttf = ttf
 	f.scale = scale

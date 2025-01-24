@@ -53,6 +53,9 @@ type FontRenderer_GL32 struct {
 type FontRenderer_GLES struct {
 }
 
+type FontRenderer_GLES32 struct {
+}
+
 var fragmentFontShader = `
 #if __VERSION__ >= 130
 #define COMPAT_VARYING in
